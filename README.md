@@ -1,33 +1,31 @@
 # scrape_imdb
 
-Scrape movies from IMDB
+## Basic Commands
 
-[![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
-[![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+- To start all containers, use this command:
+  $ docker-compose -f local.yml up
+- To rebuild containers, use this command:
+  $ docker-compose -f local.yml up --build
+- To deploy on a server containers, first create all the necessary env files with correct variables at .envs/.production/ the use command:
+  $ docker-compose -f production.yml up
 
-License: MIT
+## Run Scrape
+
+You can run the scrape command two ways, one asynchronous one not:
+
+- First way is by using the management command, to use it in docker use
+  $ docker-compose -f local.yml run django python manage.py scrape_movies
+- Second, you can use go to "http://127.0.0.1:8000/api/utils/scrape_movies" which will trigger the scrape using celery and you'll receive task info there.
 
 ## Settings
 
 Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings.html).
 
-## Basic Commands
-
 ### Setting Up Your Users
 
--   To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
+- To create an **superuser account**, use this command:
 
--   To create an **superuser account**, use this command:
-
-        $ python manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
-
-### Type checks
-
-Running type checks with mypy:
-
-    $ mypy scrape_imdb
+      $ docker-compose -f local.yml run django python manage.py createsuperuser
 
 ### Test coverage
 
@@ -41,22 +39,18 @@ To run the tests, check your test coverage, and generate an HTML coverage report
 
     $ pytest
 
-### Live reloading and Sass CSS compilation
-
-Moved to [Live reloading and SASS compilation](http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html).
-
 ### Celery
 
 This app comes with Celery.
 
 To run a celery worker:
 
-``` bash
+```bash
 cd scrape_imdb
 celery -A config.celery_app worker -l info
 ```
 
-Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
+Please note: For Celery's import magic to work, it is important _where_ the celery commands are run. If you are in the same folder with _manage.py_, you should be right.
 
 ## Deployment
 
