@@ -1,0 +1,86 @@
+version: '3'
+
+volumes:
+  scrape_imdb_local_postgres_data: {}
+  scrape_imdb_local_postgres_data_backups: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: scrape_imdb_local_django
+    container_name: scrape_imdb_local_django
+    platform: linux/x86_64
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - .:/app:z
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - "8000:8000"
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: scrape_imdb_production_postgres
+    container_name: scrape_imdb_local_postgres
+    volumes:
+      - scrape_imdb_local_postgres_data:/var/lib/postgresql/data:Z
+      - scrape_imdb_local_postgres_data_backups:/backups:z
+    env_file:
+      - ./.envs/.local/.postgres
+
+  docs:
+    image: scrape_imdb_local_docs
+    container_name: scrape_imdb_local_docs
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: ./compose/local/docs/Dockerfile
+    env_file:
+      - ./.envs/.local/.django
+    volumes:
+      - ./docs:/docs:z
+      - ./config:/app/config:z
+      - ./scrape_imdb:/app/scrape_imdb:z
+    ports:
+      - "9000:9000"
+    command: /start-docs
+
+  redis:
+    image: redis:6
+    container_name: scrape_imdb_local_redis
+
+  celeryworker:
+    <<: *django
+    image: scrape_imdb_local_celeryworker
+    container_name: scrape_imdb_local_celeryworker
+    depends_on:
+      - redis
+      - postgres
+    ports: []
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: scrape_imdb_local_celerybeat
+    container_name: scrape_imdb_local_celerybeat
+    depends_on:
+      - redis
+      - postgres
+    ports: []
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: scrape_imdb_local_flower
+    container_name: scrape_imdb_local_flower
+    ports:
+      - "5555:5555"
+    command: /start-flower

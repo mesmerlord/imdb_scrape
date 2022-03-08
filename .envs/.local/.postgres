@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=scrape_imdb
+POSTGRES_USER=HDXKlxxyLPDOuRugdCoBHBsUhdxMmBTO
+POSTGRES_PASSWORD=kG0LMgyVU1kXs5pPYqTZAv5nZ4dqopnIurww0esFuUVslwjYPQEAJmZpKzyeJF3v
